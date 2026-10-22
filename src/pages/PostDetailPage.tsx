@@ -1,10 +1,10 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { commentsUrl, postUrl } from '../api'
+import { commentsUrl, postUrl, userUrl } from '../api'
 import ErrorMessage from '../components/ErrorMessage'
 import Loading from '../components/Loading'
 import { useAuth } from '../context/AuthContext'
 import useFetch from '../hooks/useFetch'
-import type { Comment, Post } from '../types'
+import type { Author, Comment, Post } from '../types'
 import { deleteLocalPost, getLocalPost } from '../utils/localPosts'
 import NotFoundPage from './NotFoundPage'
 
@@ -20,6 +20,7 @@ export default function PostDetailPage() {
 
   const postFetch = useFetch<Post>(callApi ? postUrl(postId) : null)
   const commentsFetch = useFetch<Comment[]>(callApi ? commentsUrl(postId) : null)
+  const authorFetch = useFetch<Author>(postFetch.data ? userUrl(postFetch.data.userId) : null)
 
   if (!validId || postFetch.notFound) return <NotFoundPage />
 
@@ -51,7 +52,11 @@ export default function PostDetailPage() {
             <p className="post-meta">
               {post.author
                 ? `Đăng bởi ${post.author} lúc ${new Date(post.createdAt ?? '').toLocaleString('vi-VN')}`
-                : `Tác giả #${post.userId}`}
+                : authorFetch.loading
+                  ? 'Tác giả: đang tải...'
+                  : authorFetch.data
+                    ? `Tác giả: ${authorFetch.data.name} (${authorFetch.data.email})`
+                    : `Tác giả #${post.userId}`}
             </p>
             <p className="post-body">{post.body}</p>
 

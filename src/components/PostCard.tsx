@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom'
 import type { Post } from '../types'
 
-export default function PostCard({ post }: { post: Post }) {
+interface PostCardProps {
+  post: Post
+  authorName?: string
+}
+
+export default function PostCard({ post, authorName }: PostCardProps) {
   const excerpt = post.body.length > 120 ? post.body.slice(0, 120) + '...' : post.body
 
   return (
@@ -15,7 +20,7 @@ export default function PostCard({ post }: { post: Post }) {
             <span className="badge">Bài của bạn</span> {post.author}
           </>
         ) : (
-          `Tác giả #${post.userId}`
+          (authorName ? `Tác giả: ${authorName}` : `Tác giả #${post.userId}`)
         )}
       </p>
       <p>{excerpt}</p>

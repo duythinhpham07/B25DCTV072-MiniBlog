@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { POSTS_URL } from '../api'
+import { POSTS_URL, USERS_URL } from '../api'
 import ErrorMessage from '../components/ErrorMessage'
 import Loading from '../components/Loading'
 import Pagination from '../components/Pagination'
 import PostCard from '../components/PostCard'
 import useFetch from '../hooks/useFetch'
 import useSessionState from '../hooks/useSessionState'
-import type { Post } from '../types'
+import type { Author, Post } from '../types'
 import { getLocalPosts } from '../utils/localPosts'
 
 const PAGE_SIZE = 10
 
 export default function HomePage() {
   const { data, loading, error } = useFetch<Post[]>(POSTS_URL)
+  const { data: authors } = useFetch<Author[]>(USERS_URL)
   const [localPosts] = useState(getLocalPosts)
   const [keyword, setKeyword] = useSessionState('miniblog_keyword', '')
   const [page, setPage] = useSessionState('miniblog_page', 1)
@@ -76,7 +77,11 @@ export default function HomePage() {
 
           <div className="post-list">
             {pagePosts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <PostCard
+                key={post.id}
+                post={post}
+                authorName={authors?.find((author) => author.id === post.userId)?.name}
+              />
             ))}
           </div>
 

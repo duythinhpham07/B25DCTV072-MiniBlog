@@ -18,3 +18,9 @@ export interface Comment {
 export interface User {
   username: string
 }
+
+export interface Author {
+  id: number
+  name: string
+  email: string
+}
