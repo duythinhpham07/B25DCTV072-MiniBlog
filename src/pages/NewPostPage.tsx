@@ -50,6 +50,7 @@ export default function NewPostPage() {
 
     sessionStorage.removeItem('miniblog_page')
     sessionStorage.removeItem('miniblog_keyword')
+    sessionStorage.removeItem('miniblog_author')
     navigate('/', { state: { message: 'Đăng bài thành công!' } })
   }
 

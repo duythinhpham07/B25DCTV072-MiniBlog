@@ -20,7 +20,13 @@ Phạm Duy Thịnh – B25DCTV072 – Lập trình Web
 - **Xóa bài viết của mình**: nút Xóa ở trang chi tiết, chỉ hiện với bài do người đang đăng nhập viết, có hỏi xác nhận trước khi xóa.
 - **Phân trang**: 10 bài mỗi trang. Trang đang xem và từ khóa tìm kiếm được lưu vào sessionStorage (`useSessionState`), nên từ trang chi tiết quay lại vẫn giữ nguyên.
 - **Tên tác giả**: lấy từ API `/users`; nếu API này lỗi thì hiện tạm "Tác giả #id", không ảnh hưởng danh sách bài viết.
-- **Giao diện sáng/tối**: nút 🌙/☀️ trên header (`useTheme`), lần đầu theo cài đặt của máy, lựa chọn được lưu vào localStorage.
+- **Giao diện sáng/tối**: nút mặt trăng/mặt trời trên header (`useTheme`), lần đầu theo cài đặt của máy, lựa chọn được lưu vào localStorage.
+- **Lọc theo tác giả**: hàng 10 tác giả ở đầu trang chủ, bấm vào một người để xem bài của người đó, bấm lại để bỏ lọc.
+
+## Giao diện
+
+- Mỗi tác giả có một màu riêng (`src/utils/authors.ts`), dùng cho avatar, vạch màu bên trái mỗi bài và phần đầu trang đọc bài. Phần còn lại của trang chỉ dùng màu chàm và trắng để màu tác giả nổi lên.
+- Font của người Việt thiết kế: **Phudu** (tiêu đề lớn, chỉ có chữ hoa) và **Be Vietnam Pro** (nội dung, tiêu đề bài). Font được cài bằng `@fontsource` nên chạy không cần mạng.
 
 ## Cấu trúc
 
@@ -36,10 +42,14 @@ src/
 │   ├── useFetch.ts           # gọi API: data / loading / error
 │   ├── useSessionState.ts    # useState có lưu vào sessionStorage
 │   └── useTheme.ts           # giao diện sáng / tối
-├── utils/localPosts.ts       # đọc / ghi / xóa bài viết trong localStorage
+├── utils/
+│   ├── localPosts.ts         # đọc / ghi / xóa bài viết trong localStorage
+│   └── authors.ts            # màu riêng và chữ viết tắt của từng tác giả
 ├── components/
 │   ├── Header.tsx
 │   ├── ProtectedRoute.tsx
+│   ├── AuthorFilter.tsx
+│   ├── Avatar.tsx
 │   ├── PostCard.tsx
 │   ├── Pagination.tsx
 │   ├── Loading.tsx

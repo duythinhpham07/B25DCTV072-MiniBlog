@@ -1,10 +1,12 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { commentsUrl, postUrl, userUrl } from '../api'
+import Avatar from '../components/Avatar'
 import ErrorMessage from '../components/ErrorMessage'
 import Loading from '../components/Loading'
 import { useAuth } from '../context/AuthContext'
 import useFetch from '../hooks/useFetch'
 import type { Author, Comment, Post } from '../types'
+import { authorColor } from '../utils/authors'
 import { deleteLocalPost, getLocalPost } from '../utils/localPosts'
 import NotFoundPage from './NotFoundPage'
 
@@ -35,6 +37,13 @@ export default function PostDetailPage() {
     navigate('/', { state: { message: 'Đã xóa bài viết.' } })
   }
 
+  const color = authorColor(post?.userId ?? 0)
+  const authorLabel = post?.author
+    ? post.author
+    : authorFetch.loading
+      ? 'Đang tải tác giả...'
+      : (authorFetch.data?.name ?? `Tác giả #${post?.userId}`)
+
   return (
     <div>
       <Link to="/" className="back-link">
@@ -47,28 +56,37 @@ export default function PostDetailPage() {
 
       {post && !postFetch.loading && (
         <>
-          <article className="post-detail">
-            <h1>{post.title}</h1>
-            <p className="post-meta">
-              {post.author
-                ? `Đăng bởi ${post.author} lúc ${new Date(post.createdAt ?? '').toLocaleString('vi-VN')}`
-                : authorFetch.loading
-                  ? 'Tác giả: đang tải...'
-                  : authorFetch.data
-                    ? `Tác giả: ${authorFetch.data.name} (${authorFetch.data.email})`
-                    : `Tác giả #${post.userId}`}
-            </p>
-            <p className="post-body">{post.body}</p>
+          <article className="article">
+            <header className="article-head" style={{ background: color.bg, color: color.on }}>
+              <h1 className="article-title">{post.title}</h1>
+              <div className="article-byline">
+                <Avatar name={authorLabel} colorId={post.userId} size="md" />
+                <div>
+                  <p className="article-author">{authorLabel}</p>
+                  <p className="article-sub">
+                    {post.author
+                      ? `Đăng lúc ${new Date(post.createdAt ?? '').toLocaleString('vi-VN')}`
+                      : authorFetch.data?.email}
+                  </p>
+                </div>
+              </div>
+            </header>
 
-            {canDelete && (
-              <button className="btn btn-danger post-delete" onClick={handleDelete}>
-                Xóa bài viết
-              </button>
-            )}
+            <div className="article-body">
+              <p>{post.body}</p>
+
+              {canDelete && (
+                <button className="btn btn-danger" onClick={handleDelete}>
+                  Xóa bài viết
+                </button>
+              )}
+            </div>
           </article>
 
-          <section className="comments">
-            <h2>Bình luận {!commentsFetch.loading && !commentsFetch.error && `(${comments.length})`}</h2>
+          <section className="comments" aria-labelledby="comments-title">
+            <h2 id="comments-title">
+              {commentsFetch.loading || commentsFetch.error ? 'Bình luận' : `${comments.length} bình luận`}
+            </h2>
 
             {commentsFetch.loading && <Loading text="Đang tải bình luận..." />}
 
@@ -82,9 +100,12 @@ export default function PostDetailPage() {
 
             {comments.map((comment) => (
               <div className="comment" key={comment.id}>
-                <p className="comment-name">{comment.name}</p>
-                <p className="comment-email">{comment.email}</p>
-                <p>{comment.body}</p>
+                <Avatar name={comment.email} colorId={(comment.id % 10) + 1} size="sm" />
+                <div>
+                  <p className="comment-email">{comment.email}</p>
+                  <p className="comment-name">{comment.name}</p>
+                  <p className="comment-body">{comment.body}</p>
+                </div>
               </div>
             ))}
           </section>
