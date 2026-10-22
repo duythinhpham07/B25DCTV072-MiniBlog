@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react'
 
+interface FetchResult<T> {
+  url: string | null
+  data: T | null
+  error: string | null
+  notFound: boolean
+}
+
 export default function useFetch<T>(url: string | null) {
-  const [data, setData] = useState<T | null>(null)
-  const [loading, setLoading] = useState(url !== null)
-  const [error, setError] = useState<string | null>(null)
-  const [notFound, setNotFound] = useState(false)
+  const [result, setResult] = useState<FetchResult<T>>({
+    url: null,
+    data: null,
+    error: null,
+    notFound: false,
+  })
 
   useEffect(() => {
     if (url === null) return
@@ -12,27 +21,20 @@ export default function useFetch<T>(url: string | null) {
     let ignore = false
 
     async function fetchData(url: string) {
-      setLoading(true)
-      setError(null)
-      setNotFound(false)
       try {
         const res = await fetch(url)
         if (res.status === 404) {
-          if (!ignore) setNotFound(true)
+          if (!ignore) setResult({ url, data: null, error: null, notFound: true })
           return
         }
         if (!res.ok) throw new Error(`Máy chủ trả về lỗi ${res.status}.`)
         const json: T = await res.json()
-        if (!ignore) setData(json)
+        if (!ignore) setResult({ url, data: json, error: null, notFound: false })
       } catch (err) {
         if (ignore) return
-        if (err instanceof TypeError) {
-          setError('Không kết nối được tới máy chủ, hãy kiểm tra mạng.')
-        } else {
-          setError(err instanceof Error ? err.message : 'Đã có lỗi xảy ra.')
-        }
-      } finally {
-        if (!ignore) setLoading(false)
+        let message = err instanceof Error ? err.message : 'Đã có lỗi xảy ra.'
+        if (err instanceof TypeError) message = 'Không kết nối được tới máy chủ, hãy kiểm tra mạng.'
+        setResult({ url, data: null, error: message, notFound: false })
       }
     }
 
@@ -43,5 +45,12 @@ export default function useFetch<T>(url: string | null) {
     }
   }, [url])
 
-  return { data, loading: url !== null && loading, error, notFound }
+  const done = result.url === url
+
+  return {
+    data: done ? result.data : null,
+    loading: url !== null && !done,
+    error: done ? result.error : null,
+    notFound: done && result.notFound,
+  }
 }
