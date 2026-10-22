@@ -48,6 +48,8 @@ export default function NewPostPage() {
       createdAt: new Date().toISOString(),
     })
 
+    sessionStorage.removeItem('miniblog_page')
+    sessionStorage.removeItem('miniblog_keyword')
     navigate('/', { state: { message: 'Đăng bài thành công!' } })
   }
 
