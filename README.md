@@ -15,22 +15,33 @@ Phạm Duy Thịnh – B25DCTV072 – Lập trình Web
 | 5 | Form viết bài có kiểm tra dữ liệu, bài mới lưu localStorage và hiện cùng danh sách | `NewPostPage`: tiêu đề 5–100 ký tự, nội dung ≥ 20 ký tự; bài mới hiện đầu danh sách và xem chi tiết được |
 | 6 | Trang 404 | Route `*` → `NotFoundPage`; `/posts/abc` hoặc bài không tồn tại (`/posts/999`) cũng hiện 404 |
 
+### Làm thêm
+
+- **Xóa bài viết của mình**: nút Xóa ở trang chi tiết, chỉ hiện với bài do người đang đăng nhập viết, có hỏi xác nhận trước khi xóa.
+- **Phân trang**: 10 bài mỗi trang. Trang đang xem và từ khóa tìm kiếm được lưu vào sessionStorage (`useSessionState`), nên từ trang chi tiết quay lại vẫn giữ nguyên.
+- **Tên tác giả**: lấy từ API `/users`; nếu API này lỗi thì hiện tạm "Tác giả #id", không ảnh hưởng danh sách bài viết.
+- **Giao diện sáng/tối**: nút 🌙/☀️ trên header (`useTheme`), lần đầu theo cài đặt của máy, lựa chọn được lưu vào localStorage.
+
 ## Cấu trúc
 
 ```
 src/
 ├── api.ts                    # đường dẫn API JSONPlaceholder
-├── types.ts                  # kiểu Post, Comment, User
+├── types.ts                  # kiểu Post, Comment, User, Author
 ├── App.tsx                   # khai báo các route
 ├── main.tsx
 ├── index.css
 ├── context/AuthContext.tsx   # đăng nhập / đăng xuất
-├── hooks/useFetch.ts         # gọi API: data / loading / error
-├── utils/localPosts.ts       # đọc / ghi bài viết trong localStorage
+├── hooks/
+│   ├── useFetch.ts           # gọi API: data / loading / error
+│   ├── useSessionState.ts    # useState có lưu vào sessionStorage
+│   └── useTheme.ts           # giao diện sáng / tối
+├── utils/localPosts.ts       # đọc / ghi / xóa bài viết trong localStorage
 ├── components/
 │   ├── Header.tsx
 │   ├── ProtectedRoute.tsx
 │   ├── PostCard.tsx
+│   ├── Pagination.tsx
 │   ├── Loading.tsx
 │   └── ErrorMessage.tsx
 └── pages/
