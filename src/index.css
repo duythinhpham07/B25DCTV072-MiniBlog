@@ -131,6 +131,15 @@ main.container {
   background: #eff6ff;
 }
 
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
 .search-input {
   width: 100%;
   padding: 10px 14px;
@@ -212,6 +221,10 @@ main.container {
 .post-body {
   white-space: pre-line;
   margin: 0;
+}
+
+.post-delete {
+  margin-top: 20px;
 }
 
 .comments h2 {

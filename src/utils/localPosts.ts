@@ -21,3 +21,8 @@ export function addLocalPost(post: Post) {
   const posts = [post, ...getLocalPosts()]
   localStorage.setItem(KEY, JSON.stringify(posts))
 }
+
+export function deleteLocalPost(id: number) {
+  const posts = getLocalPosts().filter((post) => post.id !== id)
+  localStorage.setItem(KEY, JSON.stringify(posts))
+}

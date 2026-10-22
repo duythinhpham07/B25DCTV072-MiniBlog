@@ -1,13 +1,16 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { commentsUrl, postUrl } from '../api'
 import ErrorMessage from '../components/ErrorMessage'
 import Loading from '../components/Loading'
+import { useAuth } from '../context/AuthContext'
 import useFetch from '../hooks/useFetch'
 import type { Comment, Post } from '../types'
-import { getLocalPost } from '../utils/localPosts'
+import { deleteLocalPost, getLocalPost } from '../utils/localPosts'
 import NotFoundPage from './NotFoundPage'
 
 export default function PostDetailPage() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const { id } = useParams()
   const postId = Number(id)
   const validId = Number.isInteger(postId) && postId > 0
@@ -22,6 +25,14 @@ export default function PostDetailPage() {
 
   const post = localPost ?? postFetch.data
   const comments = localPost ? [] : (commentsFetch.data ?? [])
+
+  const canDelete = localPost !== undefined && user?.username === localPost.author
+
+  function handleDelete() {
+    if (!window.confirm('Bạn có chắc muốn xóa bài viết này?')) return
+    deleteLocalPost(postId)
+    navigate('/', { state: { message: 'Đã xóa bài viết.' } })
+  }
 
   return (
     <div>
@@ -43,6 +54,12 @@ export default function PostDetailPage() {
                 : `Tác giả #${post.userId}`}
             </p>
             <p className="post-body">{post.body}</p>
+
+            {canDelete && (
+              <button className="btn btn-danger post-delete" onClick={handleDelete}>
+                Xóa bài viết
+              </button>
+            )}
           </article>
 
           <section className="comments">
